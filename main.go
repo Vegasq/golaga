@@ -5,13 +5,6 @@ import (
 	"log"
 )
 
-type Stage interface {
-	Draw(screen *ebiten.Image)
-	Update() error
-
-	Reset()
-}
-
 type Game struct {
 	stages          map[string]Stage
 	currentStage    string
@@ -27,16 +20,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 640, 480
+	return 1080, 1920
 }
 
 func main() {
 	ebiten.SetWindowTitle("Golaga")
+	ebiten.SetWindowSize(540, 960)
+
+	loadArt()
 
 	changeStage := make(chan string)
 	var stages = map[string]Stage{
 		"game":     &GameStage{changeStage: changeStage},
-		"menu":     &MenuStage{changeStage},
+		"menu":     &MenuStage{changeStage, nil},
 		"gameover": &GameOverStage{changeStage},
 	}
 	game := Game{stages: stages, currentStage: "menu", changeStageChan: changeStage}

@@ -1,15 +1,23 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"image/color"
 	"time"
 )
 
+const TimeBetweenBullets = time.Duration(time.Millisecond * 300)
+const BulletSpeed = 10
+const PlayerSpeed = 4
+
+var AlienDissentSpeed = 0.1
+
 type GameStage struct {
 	changeStage chan string
+
+	bg *ebiten.Image
 
 	player *Player
 	aliens []*Alien
@@ -22,6 +30,10 @@ func (g *GameStage) Update() error {
 	if g.player == nil {
 		g.player = NewPlayer()
 		g.aliens = NewAliens()
+	}
+
+	if g.bg == nil {
+		g.bg = artCache["Space_BG_04.png"]
 	}
 
 	if haveAliveAliens(g.aliens) == false {
@@ -78,10 +90,16 @@ func (g *GameStage) Update() error {
 
 	return nil
 }
+
 func (g *GameStage) Draw(screen *ebiten.Image) {
 	if alienTouchedTheGround(g.aliens) {
 		g.changeStage <- "gameover"
 	}
+
+	geoM := ebiten.GeoM{}
+	screen.DrawImage(g.bg, &ebiten.DrawImageOptions{
+		GeoM: geoM,
+	})
 
 	screen.DrawImage(g.player.img, &ebiten.DrawImageOptions{
 		GeoM: *g.player.pos,
@@ -155,15 +173,14 @@ func (a *Alien) Update() {
 }
 
 func NewAlien(x, y float64) *Alien {
-	img2Color := color.NRGBA{R: 0xff, G: 0x00, B: 0x00, A: 0xff}
 	alien := &Alien{
-		img: ebiten.NewImage(30, 30),
+		img: artCache["Ship_06.png"],
 		pos: &ebiten.GeoM{},
 
 		w: 30, h: 30,
 	}
-	alien.img.Fill(img2Color)
 	alien.pos.Translate(x, y)
+	alien.pos.Scale(0.125, 0.125)
 	alien.wiggleCountdown = 0
 
 	return alien
@@ -174,8 +191,8 @@ func NewAliens() []*Alien {
 
 	var i float64
 	var j float64
-	for i = 100; i < 600; i += 50 {
-		for j = 0; j < 150; j += 50 {
+	for i = 1000; i < 10000; i += 2000 {
+		for j = 0; j < 1500; j += 1200 {
 			alien := NewAlien(i, j)
 			aliens = append(aliens, alien)
 		}
@@ -187,32 +204,27 @@ func NewAliens() []*Alien {
 }
 
 func NewBullet(playerPos ebiten.GeoM) *Bullet {
-	b := ebiten.NewImage(10, 10)
-	img2Color := color.NRGBA{R: 0xff, G: 0x00, B: 0x00, A: 0xff}
-	b.Fill(img2Color)
-
-	bpos := playerPos
-	return &Bullet{b, &bpos}
+	bpos := ebiten.GeoM{}
+	bpos.Scale(0.2, 0.2)
+	bpos.Translate(playerPos.Element(0, 2)+47, playerPos.Element(1, 2)-20)
+	return &Bullet{artCache["Fire_Shot_4_2.png"], &bpos}
 }
 
 func NewPlayer() *Player {
 	player := &Player{}
-	player.img = ebiten.NewImage(100, 30)
-	player.w = 100
-	player.h = 30
-	img2Color := color.NRGBA{R: 0xff, G: 0x00, B: 0x00, A: 0xff}
-	player.img.Fill(img2Color)
+
+	player.img = artCache["Ship_LVL_1.png"]
+
+	player.w = 106
+	player.h = 86
+	//img2Color := color.NRGBA{R: 0xff, G: 0x00, B: 0x00, A: 0xff}
+	//player.img.Fill(img2Color)
 
 	player.pos = &ebiten.GeoM{}
-	player.pos.Translate(100, 440)
+	player.pos.Translate(100, 1920)
+	player.pos.Scale(0.125, 0.125)
 	return player
 }
-
-const TimeBetweenBullets = time.Duration(time.Millisecond * 300)
-const BulletSpeed = 10
-const PlayerSpeed = 4
-
-var AlienDissentSpeed = 1.1
 
 func haveAliveAliens(aliens []*Alien) bool {
 	for _, a := range aliens {
@@ -235,5 +247,4 @@ func alienTouchedTheGround(aliens []*Alien) bool {
 		}
 	}
 	return false
-
 }
