@@ -44,7 +44,7 @@ func getOpentypeFaces() map[int]font.Face {
 type MenuStage struct {
 	changeStage chan string
 
-	bg *ebiten.Image
+	background *Background
 }
 
 func (g *MenuStage) Update() error {
@@ -53,23 +53,18 @@ func (g *MenuStage) Update() error {
 		g.changeStage <- "game"
 	}
 
-	if g.bg == nil {
-		img, _, err := ebitenutil.NewImageFromFile("art/Space-vertical-game-backgrounds/PNG/Space_BG_04/Space_BG_04.png")
-		if err != nil {
-			fmt.Println("Failed to load image: ", err)
-		}
-		g.bg = img
+	if g.background == nil {
+		g.background = NewBackground("Space_BG_01")
 	}
+
+	g.background.Update()
 
 	return nil
 }
 func (g *MenuStage) Draw(screen *ebiten.Image) {
 	faces := getOpentypeFaces()
-	geoM := ebiten.GeoM{}
-	//geoM.Scale(0.3, 0.3)
-	screen.DrawImage(g.bg, &ebiten.DrawImageOptions{
-		GeoM: geoM,
-	})
+	g.background.Draw(screen)
+
 	text.Draw(screen, "Press SPACE to start", faces[3], 100, 100, image.White)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))

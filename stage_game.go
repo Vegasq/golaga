@@ -12,7 +12,7 @@ const TimeBetweenBullets = time.Duration(time.Millisecond * 300)
 const BulletSpeed = 10
 const PlayerSpeed = 4
 
-var AlienDissentSpeed = 0.1
+var AlienDissentSpeed = float64(1)
 
 type GameStage struct {
 	changeStage chan string
@@ -24,16 +24,24 @@ type GameStage struct {
 
 	bullets           []*Bullet
 	lastBulletSpawned time.Time
+
+	background *Background
 }
 
 func (g *GameStage) Update() error {
+	if g.background == nil {
+		g.background = NewBackground("Space_BG_04")
+	}
+
+	g.background.Update()
+
 	if g.player == nil {
 		g.player = NewPlayer()
 		g.aliens = NewAliens()
 	}
 
 	if g.bg == nil {
-		g.bg = artCache["Space_BG_04.png"]
+		g.bg = artCache["Space_BG_04"]
 	}
 
 	if haveAliveAliens(g.aliens) == false {
@@ -92,14 +100,11 @@ func (g *GameStage) Update() error {
 }
 
 func (g *GameStage) Draw(screen *ebiten.Image) {
-	if alienTouchedTheGround(g.aliens) {
+	if alienTouchedTheGround(screen, g.aliens) {
 		g.changeStage <- "gameover"
 	}
 
-	geoM := ebiten.GeoM{}
-	screen.DrawImage(g.bg, &ebiten.DrawImageOptions{
-		GeoM: geoM,
-	})
+	g.background.Draw(screen)
 
 	screen.DrawImage(g.player.img, &ebiten.DrawImageOptions{
 		GeoM: *g.player.pos,
@@ -117,7 +122,7 @@ func (g *GameStage) Draw(screen *ebiten.Image) {
 		if a == nil {
 			continue
 		}
-		a.pos.Translate(a.wiggle, AlienDissentSpeed)
+		a.pos.Translate(a.wiggle, float64(AlienDissentSpeed))
 		screen.DrawImage(a.img, &ebiten.DrawImageOptions{GeoM: *a.pos})
 	}
 
@@ -173,14 +178,15 @@ func (a *Alien) Update() {
 }
 
 func NewAlien(x, y float64) *Alien {
+	w, h := artCache["Ship_06"].Size()
 	alien := &Alien{
-		img: artCache["Ship_06.png"],
+		img: artCache["Ship_06"],
 		pos: &ebiten.GeoM{},
 
-		w: 30, h: 30,
+		w: float64(w), h: float64(h),
 	}
 	alien.pos.Translate(x, y)
-	alien.pos.Scale(0.125, 0.125)
+	//alien.pos.Scale(0.125, 0.125)
 	alien.wiggleCountdown = 0
 
 	return alien
@@ -191,38 +197,36 @@ func NewAliens() []*Alien {
 
 	var i float64
 	var j float64
-	for i = 1000; i < 10000; i += 2000 {
-		for j = 0; j < 1500; j += 1200 {
+	for i = 100; i < 1000; i += 200 {
+		for j = 0; j < 150; j += 120 {
 			alien := NewAlien(i, j)
 			aliens = append(aliens, alien)
 		}
 	}
 
-	AlienDissentSpeed = AlienDissentSpeed * 1.1
+	AlienDissentSpeed = float64(AlienDissentSpeed) * 1.1
 
 	return aliens
 }
 
 func NewBullet(playerPos ebiten.GeoM) *Bullet {
 	bpos := ebiten.GeoM{}
-	bpos.Scale(0.2, 0.2)
 	bpos.Translate(playerPos.Element(0, 2)+47, playerPos.Element(1, 2)-20)
-	return &Bullet{artCache["Fire_Shot_4_2.png"], &bpos}
+	return &Bullet{artCache["Fire_Shot_4_2"], &bpos}
 }
 
 func NewPlayer() *Player {
 	player := &Player{}
 
-	player.img = artCache["Ship_LVL_1.png"]
+	player.img = artCache["Ship_LVL_1"]
 
-	player.w = 106
-	player.h = 86
-	//img2Color := color.NRGBA{R: 0xff, G: 0x00, B: 0x00, A: 0xff}
-	//player.img.Fill(img2Color)
+	w, h := player.img.Size()
+
+	player.w = float64(w)
+	player.h = float64(h)
 
 	player.pos = &ebiten.GeoM{}
-	player.pos.Translate(100, 1920)
-	player.pos.Scale(0.125, 0.125)
+	player.pos.Translate(100, 1720)
 	return player
 }
 
@@ -235,14 +239,15 @@ func haveAliveAliens(aliens []*Alien) bool {
 	return false
 }
 
-func alienTouchedTheGround(aliens []*Alien) bool {
+func alienTouchedTheGround(screen *ebiten.Image, aliens []*Alien) bool {
+	_, h := screen.Size()
 	for _, a := range aliens {
 		if a == nil {
 			continue
 		}
 
-		y := a.pos.Element(1, 2)
-		if y > 480 {
+		y := int(a.pos.Element(1, 2))
+		if y > h {
 			return true
 		}
 	}

@@ -10,9 +10,16 @@ import (
 
 type GameOverStage struct {
 	changeStage chan string
+	background  *Background
 }
 
 func (g *GameOverStage) Update() error {
+	if g.background == nil {
+		g.background = NewBackground("Space_BG_03")
+	}
+
+	g.background.Update()
+
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
 		fmt.Println("space")
 		g.changeStage <- "game"
@@ -21,6 +28,8 @@ func (g *GameOverStage) Update() error {
 	return nil
 }
 func (g *GameOverStage) Draw(screen *ebiten.Image) {
+	g.background.Draw(screen)
+
 	faces := getOpentypeFaces()
 	text.Draw(screen, "Game Over", faces[3], 100, 100, image.White)
 

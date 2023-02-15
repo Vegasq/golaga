@@ -32,8 +32,8 @@ func main() {
 	changeStage := make(chan string)
 	var stages = map[string]Stage{
 		"game":     &GameStage{changeStage: changeStage},
-		"menu":     &MenuStage{changeStage, nil},
-		"gameover": &GameOverStage{changeStage},
+		"menu":     &MenuStage{changeStage: changeStage},
+		"gameover": &GameOverStage{changeStage: changeStage},
 	}
 	game := Game{stages: stages, currentStage: "menu", changeStageChan: changeStage}
 
