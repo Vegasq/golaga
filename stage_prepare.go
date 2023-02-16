@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"image"
+	"log"
 	"time"
 )
 
@@ -29,10 +30,13 @@ func (g *PrepareStage) Update() error {
 		g.init = true
 	}
 
-	g.background.Update()
+	if err := g.background.Update(); err != nil {
+		log.Printf("error in background update: %v", err)
+	}
 
 	if time.Since(g.initDate) > waitInPrepareStage && ebiten.IsKeyPressed(ebiten.KeySpace) {
 		g.init = false
+		log.Println("change stage to game")
 		g.changeStage <- "game"
 	}
 

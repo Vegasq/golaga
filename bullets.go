@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"log"
 	"time"
 )
 
@@ -28,12 +29,18 @@ func (b *Bullets) Update() error {
 	}
 
 	for _, bullet := range b.bullets {
-		bullet.Update()
+		if err := bullet.Update(); err != nil {
+			log.Printf("Error updating bullet: %v", err)
+		}
 	}
 	return nil
 }
 
 func (b *Bullets) Draw(screen *ebiten.Image) {
+	if b == nil || b.bullets == nil {
+		return
+	}
+
 	for _, bullet := range b.bullets {
 		if bullet == nil {
 			continue

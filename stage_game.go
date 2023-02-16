@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"image"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -29,11 +30,14 @@ type GameStage struct {
 	lastBulletSpawned time.Time
 
 	background *Background
+	init       bool
+
+	score int
 }
 
 func (g *GameStage) Update() error {
 
-	if g.player == nil {
+	if g.init == false {
 		g.player = NewPlayer()
 		g.bullets = NewBullets(g.player)
 		g.aliens = NewAliens()
@@ -41,17 +45,35 @@ func (g *GameStage) Update() error {
 		i := rand.Intn(len(backgrounds))
 		g.background = NewBackground(backgrounds[i], 5)
 		g.alienBullets = NewAliensBullets(g.aliens)
+
+		g.init = true
 	}
 
-	g.player.Update()
-	g.bullets.Update()
-	g.background.Update()
-	g.aliens.Update()
-	g.alienBullets.Update()
+	if g.player == nil || g.aliens == nil || g.bullets == nil || g.background == nil || g.alienBullets == nil {
+		return nil
+	}
+
+	if err := g.player.Update(); err != nil {
+		log.Printf("error in player update: %v", err)
+	}
+	if err := g.bullets.Update(); err != nil {
+		log.Printf("error in bullets update: %v", err)
+	}
+	if err := g.background.Update(); err != nil {
+		log.Printf("error in background update: %v", err)
+	}
+	if err := g.aliens.Update(); err != nil {
+		log.Printf("error in aliens update: %v", err)
+	}
+	if err := g.alienBullets.Update(); err != nil {
+		log.Printf("error in alien bullets update: %v", err)
+	}
 
 	aliensShoot(g.aliens, g.alienBullets)
 
 	if haveAliveAliens(g.aliens) == false {
+		log.Println("move to prepare stage")
+		g.init = false
 		g.changeStage <- "prepare"
 	}
 
@@ -62,6 +84,8 @@ func (g *GameStage) Update() error {
 	}
 
 	if g.player.alive == false {
+		g.init = false
+		log.Println("move to gameover stage")
 		g.changeStage <- "gameover"
 	}
 
@@ -69,6 +93,10 @@ func (g *GameStage) Update() error {
 }
 
 func (g *GameStage) Draw(screen *ebiten.Image) {
+	if g.aliens == nil || g.player == nil || g.bullets == nil || g.background == nil || g.alienBullets == nil {
+		return
+	}
+
 	if alienTouchedTheGround(screen, g.aliens) {
 		g.changeStage <- "gameover"
 	}
@@ -82,6 +110,7 @@ func (g *GameStage) Draw(screen *ebiten.Image) {
 	faces := getOpentypeFaces()
 	text.Draw(screen, "Move: Arrows", faces[3], 50, 100, image.White)
 	text.Draw(screen, "Shoot: Spacebar", faces[3], 50, 150, image.White)
+	text.Draw(screen, fmt.Sprintf("Score: %d", g.score), faces[3], 450, 100, image.White)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }
@@ -90,6 +119,7 @@ func (g *GameStage) Reset() {
 	g.player = nil
 	g.aliens = nil
 	g.bullets = nil
+	g.alienBullets = nil
 	g.background = nil
 }
 
@@ -145,9 +175,10 @@ func bulletsAlienCollision(g *GameStage) {
 
 			withinXAxis := xB > xA && xB < xA+a.w
 			withinYAxis := yB > yA && yB < yA+a.h
-			if withinXAxis && withinYAxis {
+			if withinXAxis && withinYAxis && g.bullets.bullets[j] != nil && aliens[i].animation.exploding == false {
 				aliens[i].animation.Explode()
 				g.bullets.bullets[j] = nil
+				g.score += 1
 			}
 		}
 	}
@@ -168,7 +199,10 @@ func bulletsPlayerCollision(g *GameStage) bool {
 		withinXAxis := xB > xA && xB < xA+g.player.w
 		withinYAxis := yB > yA && yB < yA+g.player.h
 		if withinXAxis && withinYAxis {
-			g.bullets.bullets[j] = nil
+			if g == nil || g.bullets == nil {
+				continue
+			}
+			g.alienBullets.bullets[j] = nil
 
 			return true
 		}

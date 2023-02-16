@@ -5,6 +5,9 @@ import (
 	"log"
 )
 
+const WindowWidth = 1080
+const WindowHeight = 1920
+
 type Game struct {
 	stages          map[string]Stage
 	currentStage    string
@@ -20,7 +23,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 1080, 1920
+	return WindowWidth, WindowHeight
 }
 
 func main() {

@@ -39,6 +39,11 @@ func (b *Background) Update() error {
 }
 
 func (b *Background) Draw(screen *ebiten.Image) {
+
+	if b == nil || b.bg == nil || b.pos1 == nil || b.pos2 == nil {
+		return
+	}
+
 	screen.DrawImage(b.bg, &ebiten.DrawImageOptions{
 		GeoM: *b.pos1,
 	})
