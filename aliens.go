@@ -9,7 +9,7 @@ func NewAliens() *Aliens {
 
 	var i float64
 	var j float64
-	for i = 100; i < 1000; i += 200 {
+	for i = 100; i < WindowWidth; i += 200 {
 		for j = 0; j < 150; j += 120 {
 			alien := NewAlien(i, j)
 			aliens = append(aliens, alien)
