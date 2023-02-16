@@ -49,12 +49,11 @@ type MenuStage struct {
 
 func (g *MenuStage) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		fmt.Println("space")
-		g.changeStage <- "game"
+		g.changeStage <- "prepare"
 	}
 
 	if g.background == nil {
-		g.background = NewBackground("Space_BG_01")
+		g.background = NewBackground("Space_BG_01", 1)
 	}
 
 	g.background.Update()
@@ -65,7 +64,9 @@ func (g *MenuStage) Draw(screen *ebiten.Image) {
 	faces := getOpentypeFaces()
 	g.background.Draw(screen)
 
-	text.Draw(screen, "Press SPACE to start", faces[3], 100, 100, image.White)
+	_, h := screen.Size()
+	text.Draw(screen, "Galaxy Under Attack", faces[4], 100, h/2, image.White)
+	text.Draw(screen, "Press SPACE to start", faces[3], 100, (h/2)+100, image.White)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }

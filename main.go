@@ -34,6 +34,7 @@ func main() {
 		"game":     &GameStage{changeStage: changeStage},
 		"menu":     &MenuStage{changeStage: changeStage},
 		"gameover": &GameOverStage{changeStage: changeStage},
+		"prepare":  &PrepareStage{changeStage: changeStage},
 	}
 	game := Game{stages: stages, currentStage: "menu", changeStageChan: changeStage}
 

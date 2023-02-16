@@ -2,26 +2,27 @@ package main
 
 import "github.com/hajimehoshi/ebiten/v2"
 
-type Player struct {
-	img *ebiten.Image
-	pos *ebiten.GeoM
-
-	w, h float64
-}
-
 func NewPlayer() *Player {
 	player := &Player{}
 
-	player.img = artCache["Ship_LVL_1"]
+	player.animation = buildPlayerAnimation()
 
-	w, h := player.img.Size()
-
-	player.w = float64(w)
-	player.h = float64(h)
+	player.w = float64(player.animation.w)
+	player.h = float64(player.animation.h)
 
 	player.pos = &ebiten.GeoM{}
 	player.pos.Translate(100, 1720)
+	player.alive = true
 	return player
+}
+
+type Player struct {
+	//img       *ebiten.Image
+	animation *Animation
+	pos       *ebiten.GeoM
+	alive     bool
+
+	w, h float64
 }
 
 func (p *Player) Update() error {
@@ -36,7 +37,12 @@ func (p *Player) Update() error {
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
-	screen.DrawImage(p.img, &ebiten.DrawImageOptions{
+	img := p.animation.GetFrame()
+	if img == nil {
+		p.alive = false
+		return
+	}
+	screen.DrawImage(img, &ebiten.DrawImageOptions{
 		GeoM: *p.pos,
 	})
 }

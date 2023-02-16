@@ -1,30 +1,88 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+)
+
+func NewAliens() *Aliens {
+	var aliens Aliens
+
+	var i float64
+	var j float64
+	for i = 100; i < 1000; i += 200 {
+		for j = 0; j < 150; j += 120 {
+			alien := NewAlien(i, j)
+			aliens = append(aliens, alien)
+		}
+	}
+
+	AlienDissentSpeed = float64(AlienDissentSpeed) * 1.1
+
+	return &aliens
+}
 
 type Aliens []*Alien
 
+func (a Aliens) GetAliens() []*Alien {
+	aliens := []*Alien{}
+	for _, alien := range a {
+		if alien.alive {
+			aliens = append(aliens, alien)
+		}
+	}
+	return aliens
+}
+
 func (a Aliens) Update() error {
 	for _, alien := range a {
-		alien.Update()
+		if alien.alive {
+			alien.Update()
+		}
 	}
 	return nil
 }
 
 func (a Aliens) Draw(screen *ebiten.Image) {
 	for _, alien := range a {
+		if alien.alive == false {
+			continue
+		}
 		if alien == nil {
 			continue
 		}
-		screen.DrawImage(alien.img, &ebiten.DrawImageOptions{
+		nextFrame := alien.animation.GetFrame()
+		if nextFrame == nil {
+			alien.alive = false
+			return
+		}
+		screen.DrawImage(nextFrame, &ebiten.DrawImageOptions{
 			GeoM: *alien.pos,
 		})
 	}
 }
 
+func NewAlien(x, y float64) *Alien {
+	animation := buildAlienAnimation()
+
+	alien := &Alien{
+		alive:     true,
+		animation: animation,
+		pos:       &ebiten.GeoM{},
+
+		w: float64(animation.w), h: float64(animation.h),
+	}
+
+	alien.pos.Translate(x, y)
+	alien.wiggleCountdown = 0
+
+	return alien
+}
+
 type Alien struct {
-	img *ebiten.Image
-	pos *ebiten.GeoM
+	//img       *ebiten.Image
+	alive     bool
+	animation Animation
+	pos       *ebiten.GeoM
 
 	w, h float64
 
@@ -49,35 +107,4 @@ func (a *Alien) Update() {
 		a.wiggle = -1
 	}
 	a.pos.Translate(a.wiggle, float64(AlienDissentSpeed))
-}
-
-func NewAlien(x, y float64) *Alien {
-	w, h := artCache["Ship_06"].Size()
-	alien := &Alien{
-		img: artCache["Ship_06"],
-		pos: &ebiten.GeoM{},
-
-		w: float64(w), h: float64(h),
-	}
-	alien.pos.Translate(x, y)
-	alien.wiggleCountdown = 0
-
-	return alien
-}
-
-func NewAliens() Aliens {
-	var aliens Aliens
-
-	var i float64
-	var j float64
-	for i = 100; i < 1000; i += 200 {
-		for j = 0; j < 150; j += 120 {
-			alien := NewAlien(i, j)
-			aliens = append(aliens, alien)
-		}
-	}
-
-	AlienDissentSpeed = float64(AlienDissentSpeed) * 1.1
-
-	return aliens
 }

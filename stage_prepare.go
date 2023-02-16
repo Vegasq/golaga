@@ -9,41 +9,45 @@ import (
 	"time"
 )
 
-type GameOverStage struct {
+type PrepareStage struct {
 	changeStage chan string
 	background  *Background
 
+	stage    int
 	init     bool
 	initDate time.Time
 }
 
-const waitInGameoverStage = time.Duration(1 * time.Second)
+const waitInPrepareStage = time.Duration(1 * time.Second)
 
-func (g *GameOverStage) Update() error {
+func (g *PrepareStage) Update() error {
 	if g.init == false {
-		g.init = true
-		g.initDate = time.Now()
 		g.background = NewBackground("Space_BG_03", 1)
+		g.initDate = time.Now()
+		g.stage++
+
+		g.init = true
 	}
 
 	g.background.Update()
 
-	if time.Since(g.initDate) > waitInGameoverStage && ebiten.IsKeyPressed(ebiten.KeySpace) {
+	if time.Since(g.initDate) > waitInPrepareStage && ebiten.IsKeyPressed(ebiten.KeySpace) {
 		g.init = false
 		g.changeStage <- "game"
 	}
 
 	return nil
 }
-func (g *GameOverStage) Draw(screen *ebiten.Image) {
+func (g *PrepareStage) Draw(screen *ebiten.Image) {
 	g.background.Draw(screen)
 
 	faces := getOpentypeFaces()
 
 	_, h := screen.Size()
-	text.Draw(screen, "Game Over", faces[4], 100, h/2, image.White)
+	text.Draw(screen, fmt.Sprintf("Stage %d", g.stage), faces[4], 100, h/2, image.White)
+	text.Draw(screen, "Press space to start", faces[3], 100, h/2+100, image.White)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }
 
-func (g *GameOverStage) Reset() {}
+func (g *PrepareStage) Reset() {}

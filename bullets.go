@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-type Bullets struct {
-	bullets           []*Bullet
-	lastBulletSpawned time.Time
-
-	player *Player
-}
-
 func NewBullets(player *Player) *Bullets {
 	return &Bullets{
 		player:  player,
 		bullets: []*Bullet{},
 	}
+}
+
+type Bullets struct {
+	bullets           []*Bullet
+	lastBulletSpawned time.Time
+
+	player *Player
 }
 
 func (b *Bullets) Update() error {
@@ -44,6 +44,12 @@ func (b *Bullets) Draw(screen *ebiten.Image) {
 	}
 }
 
+func NewBullet(playerPos ebiten.GeoM) *Bullet {
+	bpos := ebiten.GeoM{}
+	bpos.Translate(playerPos.Element(0, 2)+47, playerPos.Element(1, 2)-20)
+	return &Bullet{artCache["Fire_Shot_4_2"], &bpos}
+}
+
 type Bullet struct {
 	img *ebiten.Image
 	pos *ebiten.GeoM
@@ -61,10 +67,4 @@ func (b *Bullet) Draw(screen *ebiten.Image) {
 	screen.DrawImage(b.img, &ebiten.DrawImageOptions{
 		GeoM: *b.pos,
 	})
-}
-
-func NewBullet(playerPos ebiten.GeoM) *Bullet {
-	bpos := ebiten.GeoM{}
-	bpos.Translate(playerPos.Element(0, 2)+47, playerPos.Element(1, 2)-20)
-	return &Bullet{artCache["Fire_Shot_4_2"], &bpos}
 }
