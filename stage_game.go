@@ -196,6 +196,7 @@ func bulletsAlienCollision(g *GameStage) {
 			withinYAxis := yB > yA && yB < yA+a.h
 			if withinXAxis && withinYAxis && g.bullets.bullets[j] != nil && aliens[i].animation.exploding == false {
 				aliens[i].animation.Explode()
+				ShipExplode()
 				g.bullets.bullets[j] = nil
 				g.score += 1
 			}

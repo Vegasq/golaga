@@ -19,7 +19,6 @@ func NewPlayer() *Player {
 }
 
 type Player struct {
-	//img       *ebiten.Image
 	animation *Animation
 	pos       *ebiten.GeoM
 	alive     bool

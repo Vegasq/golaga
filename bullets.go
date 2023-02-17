@@ -29,6 +29,7 @@ func (b *Bullets) Update() error {
 		if time.Since(b.lastBulletSpawned) > TimeBetweenBullets {
 			b.bullets = append(b.bullets, NewBullet(*b.player.pos))
 			b.lastBulletSpawned = time.Now()
+			go Bang()
 		}
 	}
 
