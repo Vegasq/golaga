@@ -20,6 +20,10 @@ type Bullets struct {
 	player *Player
 }
 
+func (b *Bullets) GetBullets() []*Bullet {
+	return b.bullets
+}
+
 func (b *Bullets) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
 		if time.Since(b.lastBulletSpawned) > TimeBetweenBullets {
@@ -41,7 +45,7 @@ func (b *Bullets) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	for _, bullet := range b.bullets {
+	for _, bullet := range b.GetBullets() {
 		if bullet == nil {
 			continue
 		}

@@ -6,22 +6,14 @@ import (
 
 func NewAliens() *Aliens {
 	var aliens Aliens
-
-	var i float64
-	var j float64
-	for i = 100; i < WindowWidth; i += 200 {
-		for j = 0; j < 150; j += 120 {
-			alien := NewAlien(i, j)
-			aliens = append(aliens, alien)
-		}
-	}
-
-	AlienDissentSpeed = float64(AlienDissentSpeed) * 1.1
-
 	return &aliens
 }
 
 type Aliens []*Alien
+
+func (a *Aliens) AddAlien(alien *Alien) {
+	*a = append(*a, alien)
+}
 
 func (a Aliens) GetAliens() []*Alien {
 	aliens := []*Alien{}
@@ -56,18 +48,20 @@ func (a Aliens) Draw(screen *ebiten.Image) {
 			return
 		}
 		screen.DrawImage(nextFrame, &ebiten.DrawImageOptions{
-			GeoM: *alien.pos,
+			GeoM: *(alien).pos,
 		})
 	}
 }
 
-func NewAlien(x, y float64) *Alien {
+func NewAlien(x, y, speed float64) *Alien {
 	animation := buildAlienAnimation()
-
+	pos := ebiten.GeoM{}
 	alien := &Alien{
 		alive:     true,
 		animation: animation,
-		pos:       &ebiten.GeoM{},
+		pos:       &pos,
+
+		speed: speed,
 
 		w: float64(animation.w), h: float64(animation.h),
 	}
@@ -83,6 +77,8 @@ type Alien struct {
 	alive     bool
 	animation Animation
 	pos       *ebiten.GeoM
+
+	speed float64
 
 	w, h float64
 
@@ -106,5 +102,5 @@ func (a *Alien) Update() {
 	} else {
 		a.wiggle = -1
 	}
-	a.pos.Translate(a.wiggle, float64(AlienDissentSpeed))
+	a.pos.Translate(a.wiggle, a.speed)
 }

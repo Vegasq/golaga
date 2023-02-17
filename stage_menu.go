@@ -68,6 +68,6 @@ func (g *MenuStage) Draw(screen *ebiten.Image) {
 	text.Draw(screen, "Galaxy Under Attack", faces[4], 100, h/2, image.White)
 	text.Draw(screen, "Press SPACE to start", faces[3], 100, (h/2)+100, image.White)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("Version 0.1, FPS: %0.2f, TPS: %0.2f", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }
 func (g *MenuStage) Reset() {}

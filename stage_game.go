@@ -8,7 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"image"
 	"log"
-	"math/rand"
 	"time"
 )
 
@@ -25,6 +24,8 @@ type GameStage struct {
 	player *Player
 	aliens *Aliens
 
+	missions []*Mission
+
 	bullets           *Bullets
 	alienBullets      *AliensBullets
 	lastBulletSpawned time.Time
@@ -36,17 +37,23 @@ type GameStage struct {
 }
 
 func (g *GameStage) Update() error {
+	portal := make(chan *Step)
 
 	if g.init == false {
+		if g.missions == nil {
+			g.missions = GetMissions()
+		}
+
 		g.player = NewPlayer()
 		g.bullets = NewBullets(g.player)
 		g.aliens = NewAliens()
-		backgrounds := []string{"Space_BG_01", "Space_BG_02", "Space_BG_03", "Space_BG_04"}
-		i := rand.Intn(len(backgrounds))
-		g.background = NewBackground(backgrounds[i], 5)
+		g.background = NewBackground(g.missions[MissionIndex].BackgroundSprite, 5)
 		g.alienBullets = NewAliensBullets(g.aliens)
 
 		g.init = true
+
+		go AliensArrival(g, portal)
+		go MissionPlayer(portal, g.missions[MissionIndex])
 	}
 
 	if g.player == nil || g.aliens == nil || g.bullets == nil || g.background == nil || g.alienBullets == nil {
@@ -71,10 +78,17 @@ func (g *GameStage) Update() error {
 
 	aliensShoot(g.aliens, g.alienBullets)
 
-	if haveAliveAliens(g.aliens) == false {
+	if haveAliveAliens(g.aliens) == false && g.missions[MissionIndex].Done && MissionIndex < len(g.missions)-1 {
 		log.Println("move to prepare stage")
 		g.init = false
+		MissionIndex++
 		g.changeStage <- "prepare"
+	} else if haveAliveAliens(g.aliens) == false && g.missions[MissionIndex].Done && MissionIndex == len(g.missions)-1 {
+		log.Println("move to prepare theend")
+		g.init = false
+		MissionIndex = 0
+		g.missions = nil
+		g.changeStage <- "theend"
 	}
 
 	bulletsAlienCollision(g)
@@ -86,6 +100,8 @@ func (g *GameStage) Update() error {
 	if g.player.alive == false {
 		g.init = false
 		log.Println("move to gameover stage")
+		MissionIndex = 0
+		g.missions = nil
 		g.changeStage <- "gameover"
 	}
 
@@ -98,6 +114,9 @@ func (g *GameStage) Draw(screen *ebiten.Image) {
 	}
 
 	if alienTouchedTheGround(screen, g.aliens) {
+		g.init = false
+		MissionIndex = 0
+		g.missions = nil
 		g.changeStage <- "gameover"
 	}
 
@@ -151,7 +170,7 @@ func alienTouchedTheGround(screen *ebiten.Image, aliens *Aliens) bool {
 }
 
 func bulletsAlienCollision(g *GameStage) {
-	for j, b := range g.bullets.bullets {
+	for j, b := range g.bullets.GetBullets() {
 		if b == nil {
 			continue
 		}
