@@ -1,4 +1,4 @@
-package main
+package golaga
 
 import (
 	"log"
@@ -108,17 +108,17 @@ func BuildPattern4(baseSpeed float64, animationName string) []Step {
 	return []Step{
 		{Wait: time.Duration(500 * time.Millisecond), Aliens: []*Alien{
 			NewAlien(padding*1, -100, baseSpeed, animationName),
-			NewAlien(padding*2, -100, baseSpeed*2, animationName),
-			NewAlien(padding*3, -100, baseSpeed*3, animationName),
-			NewAlien(padding*4, -100, baseSpeed*2, animationName),
+			NewAlien(padding*2, -100, baseSpeed*1.5, animationName),
+			NewAlien(padding*3, -100, baseSpeed*2, animationName),
+			NewAlien(padding*4, -100, baseSpeed*1.5, animationName),
 			NewAlien(padding*5, -100, baseSpeed, animationName),
 		}},
 		{Wait: time.Duration(1 * time.Second), Aliens: []*Alien{
-			NewAlien(padding*1, -100, baseSpeed*3, animationName),
-			NewAlien(padding*2, -100, baseSpeed*2, animationName),
+			NewAlien(padding*1, -100, baseSpeed*2, animationName),
+			NewAlien(padding*2, -100, baseSpeed*1.5, animationName),
 			NewAlien(padding*3, -100, baseSpeed, animationName),
-			NewAlien(padding*4, -100, baseSpeed*2, animationName),
-			NewAlien(padding*5, -100, baseSpeed*3, animationName),
+			NewAlien(padding*4, -100, baseSpeed*1.5, animationName),
+			NewAlien(padding*5, -100, baseSpeed*2, animationName),
 		}},
 	}
 }
@@ -166,7 +166,6 @@ func BuildPattern5(baseSpeed float64, animationName string) []Step {
 }
 
 func BuildPattern6(baseSpeed float64, animationName string) []Step {
-	// DaBoss
 	padding := float64(WindowWidth / 6)
 
 	return []Step{
@@ -178,10 +177,6 @@ func BuildPattern6(baseSpeed float64, animationName string) []Step {
 			NewAlien(padding*4, -100, baseSpeed, animationName),
 		}},
 		{Wait: time.Duration(300 * time.Millisecond), Aliens: []*Alien{
-			NewAlien(padding*1, -100, baseSpeed, animationName),
-			NewAlien(padding*5, -100, baseSpeed, animationName),
-		}},
-		{Wait: time.Duration(1000 * time.Millisecond), Aliens: []*Alien{
 			NewAlien(padding*1, -100, baseSpeed, animationName),
 			NewAlien(padding*5, -100, baseSpeed, animationName),
 		}},

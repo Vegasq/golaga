@@ -1,4 +1,4 @@
-module golaga
+module github.com/vegasq/golaga
 
 go 1.18
 

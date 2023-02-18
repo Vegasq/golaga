@@ -1,4 +1,4 @@
-package main
+package golaga
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -26,7 +26,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return WindowWidth, WindowHeight
 }
 
-func main() {
+func PrepareGame() *Game {
 	ebiten.SetWindowTitle("Golaga")
 	ebiten.SetWindowSize(540, 960)
 
@@ -49,8 +49,13 @@ func main() {
 			game.currentStage = newStage
 		}
 	}()
+	return &game
+}
 
-	if err := ebiten.RunGame(&game); err != nil {
+func main() {
+	game := PrepareGame()
+
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
