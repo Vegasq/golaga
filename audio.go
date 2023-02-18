@@ -3,13 +3,12 @@ package main
 import (
 	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"time"
 )
 
 const (
 	sampleRate = 32000
 )
-
-type musicType int
 
 //go:embed sound/lavik89/168984__lavik89__digital-hit.wav
 var GunSound []byte
@@ -24,6 +23,7 @@ func Bang() {
 		Context = audio.NewContext(sampleRate)
 	}
 	player := Context.NewPlayerFromBytes(GunSound)
+	player.Seek(time.Duration(100 * time.Millisecond))
 	player.Play()
 }
 
@@ -32,5 +32,7 @@ func ShipExplode() {
 		Context = audio.NewContext(sampleRate)
 	}
 	player := Context.NewPlayerFromBytes(ExplosionSound)
+	player.SetVolume(0.02)
+	player.Seek(time.Duration(100 * time.Millisecond))
 	player.Play()
 }

@@ -6,8 +6,9 @@ import (
 
 func NewPlayer() *Player {
 	player := &Player{}
+	animations := GetAnimations()
 
-	player.animation = buildPlayerAnimation()
+	player.animation = animations["Player"]
 
 	player.w = float64(player.animation.w)
 	player.h = float64(player.animation.h)
@@ -19,7 +20,7 @@ func NewPlayer() *Player {
 }
 
 type Player struct {
-	animation *Animation
+	animation Animation
 	pos       *ebiten.GeoM
 	alive     bool
 
@@ -49,7 +50,7 @@ func (p *Player) Update() error {
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
-	if p == nil || p.animation == nil {
+	if p == nil {
 		return
 	}
 

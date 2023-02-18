@@ -160,6 +160,33 @@ var Alien_1_8 []byte
 //go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Exhaust/Exhaust_4_2_009.png
 var Alien_1_9 []byte
 
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_000.png
+var Alien_exp_1_0 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_001.png
+var Alien_exp_1_1 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_002.png
+var Alien_exp_1_2 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_003.png
+var Alien_exp_1_3 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_004.png
+var Alien_exp_1_4 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_005.png
+var Alien_exp_1_5 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_006.png
+var Alien_exp_1_6 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_007.png
+var Alien_exp_1_7 []byte
+
+//go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Explosion/Ship_04_Explosion_008.png
+var Alien_exp_1_8 []byte
+
 //go:embed art/Ufo-spaceship-game-sprites/PNG/Ships_Sprites/Exhaust/Exhaust_6_1_000.png
 var Alien_2_0 []byte
 
@@ -314,6 +341,19 @@ var alien1ShipFramesData = []Art{
 	Art{"Alien_1_9", Alien_1_9, 120, 120},
 }
 
+var alien1ExpFramesData = []Art{
+	//alien
+	Art{"Alien_exp_1_0", Alien_exp_1_0, 120, 120},
+	Art{"Alien_exp_1_1", Alien_exp_1_1, 120, 120},
+	Art{"Alien_exp_1_2", Alien_exp_1_2, 120, 120},
+	Art{"Alien_exp_1_3", Alien_exp_1_3, 120, 120},
+	Art{"Alien_exp_1_4", Alien_exp_1_4, 120, 120},
+	Art{"Alien_exp_1_5", Alien_exp_1_5, 120, 120},
+	Art{"Alien_exp_1_6", Alien_exp_1_6, 120, 120},
+	Art{"Alien_exp_1_7", Alien_exp_1_7, 120, 120},
+	Art{"Alien_exp_1_8", Alien_exp_1_8, 120, 120},
+}
+
 var alien2ShipFramesData = []Art{
 	//alien
 	Art{"Alien_2_0", Alien_2_0, 120, 120},
@@ -329,7 +369,7 @@ var alien2ShipFramesData = []Art{
 }
 
 func loadAlienShipAnimationArt() {
-	packs := [][]Art{alien2ShipFramesData, alien1ShipFramesData, alien0ShipFramesData, alien0ExpFramesData, playerExplosionFramesData}
+	packs := [][]Art{alien2ShipFramesData, alien1ShipFramesData, alien0ShipFramesData, alien0ExpFramesData, alien1ExpFramesData}
 
 	for _, pack := range packs {
 		for _, art2 := range pack {

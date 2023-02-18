@@ -45,7 +45,7 @@ func (a Aliens) Draw(screen *ebiten.Image) {
 		nextFrame := alien.animation.GetFrame()
 		if nextFrame == nil {
 			alien.alive = false
-			return
+			continue
 		}
 		screen.DrawImage(nextFrame, &ebiten.DrawImageOptions{
 			GeoM: *(alien).pos,
@@ -53,8 +53,9 @@ func (a Aliens) Draw(screen *ebiten.Image) {
 	}
 }
 
-func NewAlien(x, y, speed float64) *Alien {
-	animation := buildAlienAnimation()
+func NewAlien(x, y, speed float64, animationName string) *Alien {
+	animations := GetAnimations()
+	animation := animations[animationName]
 	pos := ebiten.GeoM{}
 	alien := &Alien{
 		alive:     true,

@@ -56,9 +56,9 @@ func (g *GameStage) Update() error {
 		go MissionPlayer(portal, g.missions[MissionIndex])
 	}
 
-	if g.player == nil || g.aliens == nil || g.bullets == nil || g.background == nil || g.alienBullets == nil {
-		return nil
-	}
+	//if g.player == nil || g.aliens == nil || g.bullets == nil || g.background == nil || g.alienBullets == nil {
+	//	return nil
+	//}
 
 	if err := g.player.Update(); err != nil {
 		log.Printf("error in player update: %v", err)
